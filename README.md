@@ -1,13 +1,13 @@
 # eFactura-xml2pdf
-Script PHP care transformă facturile din format XML în format PDF pentru tipărire și vizualizare.
+Librărie PHP care transformă facturile din format XML în format PDF pentru tipărire și vizualizare.
 ## De ce există?
-Ministerul de Finanțe pune la dispoziție o "aplicație" care transformă facturile din format XML în PDF. Din păcate rezultatele pe care le produce sunt aproape ilizibile. Totuși, cei care vor să-și facă singuri implementarea eFactură se vor lovi mai devreme sau mai târziu de nevoia de a vedea facturile primite de la furnizori și își vor da seama că [uneltele](https://mfinante.gov.ro/ro/web/efactura/aplicatii-web-ro-efactura) puse la dispoziție de autorități sunt extrem de proaste.
+Ministerul de Finanțe pune la dispoziție o ["aplicație"](https://www.anaf.ro/uploadxml/) care transformă facturile din XML în PDF (serviciu disponibil și prin API). Din păcate rezultatele pe care le produce sunt aproape ilizibile și complet deconectate de ce ar avea nevoie o companie reală - un obstacol inutil pentru cei care vor să-și facă singuri implementarea eFactură.
 ## Ce am urmărit?
-* Simplu, flexibil și ușor de înțeles (tot codul este procedural și comentat);
-* Nu folosește alte librării externe în afară de [TCPDF](https://github.com/tecnickcom/tcpdf);
+* Simplitate și flexibilitate (tot codul este procedural și comentat);
+* Nu se folosesc alte librării externe în afară de [TCPDF](https://github.com/tecnickcom/tcpdf);
 * Compatibil cu PHP 5-8;
-* Este publicat sub licența [GPLv3](https://www.gnu.org/licenses/gpl-3.0.en.html). Contribuțiile sunt binevenite;
-* Pentru că standardul eFactură este stufos, prost, ambiguu și redundant am ales să acoperim doar cazurile folosite de marea majoritate a companiilor. Contribuțiile sunt binevenite.
+* Publicat sub licența [GPLv3](https://www.gnu.org/licenses/gpl-3.0.en.html). Contribuțiile sunt binevenite;
+* Pentru că standardul eFactură este stufos, redundant, prost documentat, ambiguu și implementat în grabă, scopul acestui proiect este să acopere marea majoritate a cazurilor de folosire fără să intre în scenarii de nișă. Contribuțiile sunt binevenite.
 ## Cum se folosește?
 ```php
 <?php
@@ -33,7 +33,7 @@ Ministerul de Finanțe pune la dispoziție o "aplicație" care transformă factu
 ?>
 ```
 ## Cum arată documentele generate?
-Deoarece **TCPDF** este o librărie complexă și presupune o oarecare experiență în folosire pentru rezultate optime, am creat o serie de instrucțiuni de bază (text, linie, dreptunghi etc) care se folosesc în generarea documentului. Drept urmare nu este necesară învățarea **TCPDF**.
+Deoarece **TCPDF** este o librărie complexă și presupune o oarecare experiență în folosire pentru rezultate optime, am creat o serie de instrucțiuni de bază (text, linie, dreptunghi etc) care se utilizează în generarea documentului. Drept urmare nu este necesară învățarea **TCPDF** pentru personalizarea documentelor.
 
 ### Factură PDF generată pe mfinante.ro
 ![anaf](https://github.com/user-attachments/assets/fe07d762-477f-4a77-9f05-fc1699f2faba)
