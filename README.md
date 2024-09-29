@@ -12,23 +12,19 @@ Ministerul de Finanțe pune la dispoziție o ["aplicație"](https://www.anaf.ro/
 ```php
 <?php
 
-  require_once('tcpdf/config/lang/ron.php');
   require_once('tcpdf/tcpdf.php');
   require_once('xml2pdf.php');
 
-  $xml=file_get_contents('factura.xml'); // citește fișierul XML descărcat în prealabil prin API SPV
+  $xmlString=file_get_contents('factura.xml');
+  $factura=xml2pdfParse($xmlString);
 
-  $factura=xml2pdfParse($xml); // generează un array cu câmpurile relevante din factură
+  if ($factura===false) {
+    exit('Eroare la parcurgerea fișierului XML.');
+  }
 
-  // varianta 1:
-
-  xml2pdfRender($factura); // generează și trimite inline (afișează în browser) un fișier PDF
-
-  // varianta 2:
-
-  $pdf=xml2pdfRender($factura,true); // generează și returnează un fișier PDF
+  $r=xml2pdfRender($factura,true);
   header("Content-type:application/pdf");
-  echo $pdf;
+  echo $r;
 
 ?>
 ```
