@@ -64,7 +64,7 @@
           $factura['total']=$factura['totalTVA']+$factura['totalFaraTVA'];
 
           $factura['firmaNume']=(string)$xml->xpath('//AccountingSupplierParty/Party/PartyLegalEntity/RegistrationName')[0][0];
-          $factura['firmaNrRegCom']=str_replace(' ','',(string)$xml->xpath('//AccountingSupplierParty/Party/PartyLegalEntity/CompanyID')[0][0]);
+          $factura['firmaNrRegCom']=count($xml->xpath('//AccountingSupplierParty/Party/PartyLegalEntity/CompanyID'))?str_replace(' ','',(string)$xml->xpath('//AccountingSupplierParty/Party/PartyLegalEntity/CompanyID')[0][0]):'';
           $factura['firmaCIF']=(string)$xml->xpath('//AccountingSupplierParty/Party/PartyTaxScheme/CompanyID')[0][0];
           $factura['firmaAdresa']=(string)$xml->xpath('//AccountingSupplierParty/Party/PostalAddress/StreetName')[0][0];
           $factura['firmaLocalitate']=preg_replace('/(SECTOR)([0-9]{1})/','Sector \\2',(string)$xml->xpath('//AccountingSupplierParty/Party/PostalAddress/CityName')[0][0]);
@@ -77,7 +77,8 @@
           $lines=$xml->xpath('//InvoiceLine');
           foreach($lines as $line) {
             $factura['produse'][]=array(
-              'produs'=>(string)$line->Item->Name,
+              'produs'=>trim((string)$line->Item->Name),
+              'descriere'=>trim((string)$line->Item->Description),
               'pretFaraTVA'=>(float)$line->Price->PriceAmount,
               'moneda'=>(string)$line->Price->PriceAmount->attributes()->currencyID,
               'cantitate'=>(int)$line->InvoicedQuantity,
@@ -349,7 +350,9 @@
 
     foreach($factura['produse'] as $i=>$p) {
       $y=$i?false:'vanzator+15';
-      $draw[]=array('newPageIf',285,array($p['produs'],70,8,false));
+      $produs=($p['produs'] && $p['produs']!='-'?$p['produs']:'');
+      $produs.=($produs?"\n":'').$p['descriere'];
+      $draw[]=array('newPageIf',285,array($produs,70,8,false));
       $draw[]=array('text',$i+1,10,$y,8,false);
       $draw[]=array('text',$p['pretFaraTVA'],95,$y,8,false);
       $draw[]=array('text',$p['moneda'],115,$y,8,false);
@@ -357,7 +360,7 @@
       $draw[]=array('text',$p['um'].(isset($unitati[$p['um']])?" ({$unitati[$p['um']]})":''),145,$y,8,false);
       $draw[]=array('text',$p['TVA'].'%',165,$y,8,false);
       $draw[]=array('text',$p['totalFaraTVA'],180,$y,8,false);
-      $draw[]=array('text',$p['produs'],20,$y,8,false,array(90,'L'),true);
+      $draw[]=array('text',$produs,20,$y,8,false,array(90,'L'),true);
       $draw[]=array('moveY','1');
     }
 
