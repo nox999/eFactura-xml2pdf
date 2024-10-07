@@ -47,7 +47,12 @@
           $factura['numar']=$numar;
           $factura['tip']=(string)$xml->xpath('//InvoiceTypeCode')[0][0];
           $factura['instrumentPlata']=count($xml->xpath('//PaymentMeans/PaymentMeansCode'))?(string)$xml->xpath('//PaymentMeans/PaymentMeansCode')[0][0]:'-';
-          $factura['nota']=count($xml->xpath('//Note'))?(string)$xml->xpath('//Note')[0][0]:'';
+          if (count($xml->xpath('/Invoice/Note'))) {
+            $factura['nota']='';
+            for ($i=0; $i<count($xml->xpath('/Invoice/Note')); $i++) {
+              $factura['nota'].=($factura['nota']?"\n":'').trim((string)$xml->xpath('/Invoice/Note')[$i][0]);
+            }
+          }
 
           $factura['TVA']=array();
           $factura['totalTVA']=0;
@@ -79,6 +84,7 @@
             $factura['produse'][]=array(
               'produs'=>trim((string)$line->Item->Name),
               'descriere'=>trim((string)$line->Item->Description),
+              'nota'=>trim((string)$line->Note),
               'pretFaraTVA'=>(float)$line->Price->PriceAmount,
               'moneda'=>(string)$line->Price->PriceAmount->attributes()->currencyID,
               'cantitate'=>(int)$line->InvoicedQuantity,
@@ -351,7 +357,8 @@
     foreach($factura['produse'] as $i=>$p) {
       $y=$i?false:'vanzator+15';
       $produs=($p['produs'] && $p['produs']!='-'?$p['produs']:'');
-      $produs.=($produs?"\n":'').$p['descriere'];
+      $produs.=$p['descriere']?(($produs?"\n":'').$p['descriere']):'';
+      $produs.=$p['nota']?(($produs?"\n":'')."Notă: {$p['nota']}"):'';
       $draw[]=array('newPageIf',285,array($produs,70,8,false));
       $draw[]=array('text',$i+1,10,$y,8,false);
       $draw[]=array('text',$p['pretFaraTVA'],95,$y,8,false);
