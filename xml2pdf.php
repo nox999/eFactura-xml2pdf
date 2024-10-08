@@ -85,6 +85,7 @@
               'produs'=>trim((string)$line->Item->Name),
               'descriere'=>trim((string)$line->Item->Description),
               'nota'=>trim((string)$line->Note),
+              'codVanzator'=>trim((string)$line->Item->SellersItemIdentification->ID),
               'pretFaraTVA'=>(float)$line->Price->PriceAmount,
               'moneda'=>(string)$line->Price->PriceAmount->attributes()->currencyID,
               'cantitate'=>(int)$line->InvoicedQuantity,
@@ -357,8 +358,9 @@
     foreach($factura['produse'] as $i=>$p) {
       $y=$i?false:'vanzator+15';
       $produs=($p['produs'] && $p['produs']!='-'?$p['produs']:'');
-      $produs.=$p['descriere']?(($produs?"\n":'').$p['descriere']):'';
-      $produs.=$p['nota']?(($produs?"\n":'')."Notă: {$p['nota']}"):'';
+      $produs.=$p['descriere']!=$p['produs']?($p['descriere']?(($produs?"\n":'').$p['descriere']):''):'';
+      $produs.=$p['nota']!=$p['produs']?($p['nota']?(($produs?"\n":'')."Notă: {$p['nota']}"):''):'';
+      $produs.=$p['codVanzator']?(($produs?"\n":'')."Cod vânzător: {$p['codVanzator']}"):'';
       $draw[]=array('newPageIf',285,array($produs,70,8,false));
       $draw[]=array('text',$i+1,10,$y,8,false);
       $draw[]=array('text',$p['pretFaraTVA'],95,$y,8,false);
