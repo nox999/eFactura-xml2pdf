@@ -128,14 +128,20 @@
       case '_newPage': // '_newPage', array(...) (definește ce se întâmplă când se adaugă o pagină nouă)
         $vars['_newPage']=$t[1];
         break;
-      case 'newPageIf': // 'newPageIf', y (poziția curentă > y)[, array(text, width, size, bold)] (dacă poziția curentă e mai mare de "y" se trece la o pagină nouă, alternativ verifică dacă poziția curentă + înălțimea textului depășește y)
+      case 'newPageIf': // 'newPageIf', y (poziția curentă > y)[, array(text, width, size, bold), array ...] (dacă poziția curentă e mai mare de "y" se trece la o pagină nouă, alternativ verifică dacă poziția curentă + înălțimea textului (textelor) depășește y)
         $isNewPage=false;
         if (!isset($t[2]) && $pdf->getY()>=$t[1]) {
           $isNewPage=true;
         } elseif (isset($t[2])) {
-          $pdf->SetFont('freesans',(!is_null($t[2][3]) && $t[2][3])?'B':'',!is_null($t[2][2])?$t[2][2]:9);
-          $cellHeight=$pdf->GetStringHeight($t[2][1],$t[2][0]);
-          if ($pdf->getY()+$cellHeight>=$t[1]) {
+          $simulatedHeight=$pdf->getY();
+
+          for ($i=2; $i<count($t); $i++) {
+            $pdf->SetFont('freesans',(!is_null($t[$i][3]) && $t[$i][3])?'B':'',!is_null($t[$i][2])?$t[$i][2]:9);
+            $cellHeight=$pdf->GetStringHeight($t[2][1],$t[2][0]);
+            $simulatedHeight+=$cellHeight;
+          }
+
+          if ($simulatedHeight>=$t[1]) {
             $isNewPage=true;
           }
         }
@@ -358,10 +364,18 @@
     foreach($factura['produse'] as $i=>$p) {
       $y=$i?false:'vanzator+15';
       $produs=($p['produs'] && $p['produs']!='-'?$p['produs']:'');
-      $produs.=$p['descriere']!=$p['produs']?($p['descriere']?(($produs?"\n":'').$p['descriere']):''):'';
-      $produs.=$p['nota']!=$p['produs']?($p['nota']?(($produs?"\n":'')."Notă: {$p['nota']}"):''):'';
-      $produs.=$p['codVanzator']?(($produs?"\n":'')."Cod vânzător: {$p['codVanzator']}"):'';
-      $draw[]=array('newPageIf',285,array($produs,70,8,false));
+      $produsInfo=$p['descriere']!=$p['produs']?($p['descriere']?($p['descriere']):''):'';
+      $produsInfo.=$p['nota']!=$p['produs']?($p['nota']?(($produsInfo?"\n":'')."Notă: {$p['nota']}"):''):'';
+      $produsInfo.=$p['codVanzator']?(($produsInfo?"\n":'')."Cod vânzător: {$p['codVanzator']}"):'';
+      if (!$produs && $produsInfo) {
+        $produs=$produsInfo;
+        $produsInfo='';
+      }
+      if ($produsInfo) {
+        $draw[]=array('newPageIf',285,array($produs,70,8,true),array($produsInfo,70,8,false));
+      } else {
+        $draw[]=array('newPageIf',285,array($produs,70,8,false));
+      }
       $draw[]=array('text',$i+1,10,$y,8,false);
       $draw[]=array('text',$p['pretFaraTVA'],95,$y,8,false);
       $draw[]=array('text',$p['moneda'],115,$y,8,false);
@@ -369,7 +383,10 @@
       $draw[]=array('text',$p['um'].(isset($unitati[$p['um']])?" ({$unitati[$p['um']]})":''),145,$y,8,false);
       $draw[]=array('text',$p['TVA'].'%',165,$y,8,false);
       $draw[]=array('text',$p['totalFaraTVA'],180,$y,8,false);
-      $draw[]=array('text',$produs,20,$y,8,false,array(90,'L'),true);
+      $draw[]=array('text',$produs,20,$y,8,$produsInfo?true:false,array(90,'L'),true);
+      if ($produsInfo) {
+        $draw[]=array('text',$produsInfo,20,false,8,false,array(90,'L'),true);
+      }
       $draw[]=array('moveY','1');
     }
 
