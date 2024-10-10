@@ -125,8 +125,11 @@
 
   function xml2pdfDraw($t,$pdf,&$vars) { // funcții de desenare folosite pentru reprezentarea documentului
     switch($t[0]) {
-      case '_newPage': // '_newPage', array(...) (definește ce se întâmplă după ce se adaugă o pagină nouă)
-        $vars['_newPage']=$t[1];
+      case '_newPageBefore': // '_newPageBefore', array(...) (definește ce se întâmplă înainte să se adauge o pagină nouă)
+        $vars['_newPageBefore']=$t[1];
+        break;
+      case '_newPageAfter': // '_newPageAfter', array(...) (definește ce se întâmplă după ce se adaugă o pagină nouă)
+        $vars['_newPageAfter']=$t[1];
         break;
       case 'newPageIf': // 'newPageIf', y (poziția curentă > y)[, array(text, width, size, bold), array ...] (dacă poziția curentă e mai mare de "y" se trece la o pagină nouă, alternativ verifică dacă poziția curentă + înălțimea textului (textelor) depășește y)
         $isNewPage=false;
@@ -150,10 +153,15 @@
           if (!isset($vars['_page'])) {
             $vars['_page']=1;
           }
+          if (isset($vars['_newPageBefore'])) {
+            foreach ($vars['_newPageBefore'] as $tNP) {
+              xml2pdfDraw($tNP,$pdf,$vars);
+            }
+          }
           $vars['_page']++;
           $pdf->addPage();
-          if (isset($vars['_newPage'])) {
-            foreach ($vars['_newPage'] as $tNP) {
+          if (isset($vars['_newPageAfter'])) {
+            foreach ($vars['_newPageAfter'] as $tNP) {
               xml2pdfDraw($tNP,$pdf,$vars);
             }
           }
@@ -182,6 +190,12 @@
         break;
       case 'text': // 'text', text, x, y, size, bold, array(x2,alignH,alignV='B'), isNextLine (desenează un text, dacă x sau y sunt false se folosește poziția curentă, dacă x2 este definit se folosește pentru centrarea textului, alignH poate fi 'L','C','R','J', dacă alignV = 'B' atunci textul se desenează de la poziția curentă în sus, dacă isNextLine este true atunci poziția curentă pe y se mută după text, altfel se mută orizontal după text)
         list(,$text,$x,$y,$size,$isBold,$align,$isNextLine)=array_pad($t,8,null);
+
+        foreach($vars as $p=>$val) {
+          if (gettype($val)!=='array') {
+            $text=str_replace('{{'.$p.'}}',(string)$val,$text);
+          }
+        }
 
         $pdf->SetFont('freesans',(!is_null($isBold) && $isBold)?'B':'',!is_null($size)?$size:9);
         if ($y!==false) {
@@ -258,7 +272,10 @@
     $pdf->AddPage();
 
     $draw=array(
-      array('_newPage',array(
+      array('_newPageBefore',array(
+        array('text',"Pagina {{_page}}",5,290,8,false,array(205,'C','B')),
+      )),
+      array('_newPageAfter',array(
         array('rect',5,5,205,292),
 
         array('text','Linia',10,10,8,true),
@@ -272,8 +289,10 @@
 
         array('line',10,15.5,200,15.5),
 
+        array('text',"Pagina {{_page}}",5,290,8,false,array(205,'C','B')),
         array('setY',17.5),
         array('setVar','deltaY',-2.5),
+        array('_newPageBefore',array()),
       )),
       array('rect',5,5,205,292),
 
@@ -392,9 +411,10 @@
 
     // este nevoie să trecem pe pagina următoare pentru a desena totalurile?
 
-    $draw[]=array('_newPage',array(
+    $draw[]=array('_newPageAfter',array(
       array('rect',5,5,205,292),
       array('setVar','deltaY',-2.5),
+      array('text',"Pagina {{_page}}",5,290,8,false,array(205,'C','B')),
     ));
     if ($factura['nota']) {
       $draw[]=array('newPageIf',252,array($factura['nota'],200,8,false));
@@ -445,15 +465,6 @@
 
     foreach($draw as $t) {
       xml2pdfDraw($t,$pdf,$vars);
-    }
-
-    // dacă există mai mult de o pagină, desenează numere
-
-    if (isset($vars['_page']) && $vars['_page']>1) {
-      for ($i=1; $i<=$vars['_page']; $i++) {
-        $pdf->setPage($i);
-        xml2pdfDraw(array('text',"Pagina {$i} / {$vars['_page']}",5,290,8,false,array(205,'C','B')),$pdf,$vars);
-      }
     }
 
     // întoarce PDF-ul, sau îl trimite inline în browser
