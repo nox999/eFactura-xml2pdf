@@ -125,7 +125,7 @@
 
   function xml2pdfDraw($t,$pdf,&$vars) { // funcții de desenare folosite pentru reprezentarea documentului
     switch($t[0]) {
-      case '_newPage': // '_newPage', array(...) (definește ce se întâmplă când se adaugă o pagină nouă)
+      case '_newPage': // '_newPage', array(...) (definește ce se întâmplă după ce se adaugă o pagină nouă)
         $vars['_newPage']=$t[1];
         break;
       case 'newPageIf': // 'newPageIf', y (poziția curentă > y)[, array(text, width, size, bold), array ...] (dacă poziția curentă e mai mare de "y" se trece la o pagină nouă, alternativ verifică dacă poziția curentă + înălțimea textului (textelor) depășește y)
@@ -396,7 +396,11 @@
       array('rect',5,5,205,292),
       array('setVar','deltaY',-2.5),
     ));
-    $draw[]=array('newPageIf',230);
+    if ($factura['nota']) {
+      $draw[]=array('newPageIf',252,array($factura['nota'],200,8,false));
+    } else {
+      $draw[]=array('newPageIf',252);
+    }
 
     // TVA și total
 
