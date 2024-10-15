@@ -174,6 +174,9 @@
       case 'getY': // 'getY', var (salvează pozița y curentă)
         $vars[$t[1]]=$pdf->getY();
         break;
+        case 'moveX': // 'moveX', value (mută poziția x curentă)
+          $pdf->setXY($pdf->getX()+$t[1],$pdf->getY());
+          break;
       case 'moveY': // 'moveY', value (mută poziția y curentă)
         $pdf->setXY($pdf->getX(),$pdf->getY()+$t[1]);
         break;
@@ -188,7 +191,7 @@
         $y2=xml2pdfEvalExpression($t[4],$vars);
         $pdf->rect($t[1],$y1,$t[3]-$t[1],$y2-$y1,isset($t[5])?'DF':'',isset($t[5])?array('0000'=>array()):array('LRTB'=>array('width'=>0.2,'color'=>array(0,0,0,100))),isset($t[5])?$t[5]:array());
         break;
-      case 'text': // 'text', text, x, y, size, bold, array(x2,alignH,alignV='B'), isNextLine (desenează un text, dacă x sau y sunt false se folosește poziția curentă, dacă x2 este definit se folosește pentru centrarea textului, alignH poate fi 'L','C','R','J', dacă alignV = 'B' atunci textul se desenează de la poziția curentă în sus, dacă isNextLine este true atunci poziția curentă pe y se mută după text, altfel se mută orizontal după text)
+      case 'text': // 'text', text, x, y, size, bold, array(x2, alignH, alignV='B/M', y2), isNextLine (desenează un text, dacă x sau y sunt false se folosește poziția curentă, dacă x2 este definit se folosește pentru centrarea textului, alignH poate fi 'L','C','R','J', dacă alignV = 'B' atunci textul se desenează de la poziția curentă în sus, dacă isNextLine este true atunci poziția curentă pe y se mută după text, altfel se mută orizontal după text)
         list(,$text,$x,$y,$size,$isBold,$align,$isNextLine)=array_pad($t,8,null);
 
         foreach($vars as $p=>$val) {
@@ -208,12 +211,17 @@
         $yBefore=$pdf->getY();
         $cellWidth=$pdf->GetStringWidth($text)+0.1;
         if (gettype($align)=='array' && isset($align[2]) && $align[2]=='B') {
-          $cellHeight=$pdf->GetStringHeight($align[0]-$x,$text);
+          $cellHeight=$pdf->GetStringHeight($align[0]?$align[0]-$x:0,$text);
           $pdf->setXY($pdf->getX(),$yBefore-$cellHeight);
         }
 
+        if (gettype($align)=='array' && isset($align[2]) && $align[2]=='M' && isset($align[3])) {
+          $cellHeight=$pdf->GetStringHeight($align[0]?$align[0]-$x:0,$text);
+          $pdf->setXY($pdf->getX(),$yBefore+($align[3]-$cellHeight)/2);
+        }
+
         $pdf->MultiCell(
-          gettype($align)=='array'?$align[0]-$x:$cellWidth, // cell width
+          gettype($align)=='array' && $align[0]?$align[0]-$x:$cellWidth, // cell width
           0, // cell minimum height
           $text,
           0, // no border
@@ -227,12 +235,16 @@
         }
 
         break;
+      case 'image': // 'image', file, x, y, h
+        $pdf->image($t[1],$t[2],$t[3],0,$t[4],'PNG','','T');
+        break;
     }
   }
 
   function xml2pdfRender($factura,$return=false) { // generează document PDF pornind de la un array factură
 
     // cele mai comune tipuri de documente, instrumente de plată și unități de măsură, la restul se afișează doar codul
+
     $tipuriDocument=array('-'=>'Nedefinit','380'=>'Factură','751'=>'Factură - informații în scopuri contabile');
     $instrumentePlata=array('1'=>'Nespecificat','10'=>'Numerar','42'=>'Ordin de plată','48'=>'Card bancar','54'=>'Card de credit','55'=>'Card de debit','68'=>'Plata online','ZZZ'=>'Instrument agreat');
     $unitati=array(
@@ -258,7 +270,7 @@
     $pdf->SetAuthor('xml2pdf.php');
     $pdf->SetTitle('Factura '.$factura['firmaNume'].' din '.$factura['dataFactura']);
 
-    // setup doc
+    // inițializează document
 
     $pdf->SetMargins(0,0,0);
     $pdf->setCellPadding(0);
@@ -267,114 +279,129 @@
     $pdf->setPrintFooter(false);
     $pdf->SetAutoPageBreak(false,0);
 
-    // setup page
+    // creează prima pagină
 
     $pdf->AddPage();
 
-    $draw=array(
-      array('_newPageBefore',array(
-        array('text',"Pagina {{_page}}",5,290,8,false,array(205,'C','B')),
-      )),
-      array('_newPageAfter',array(
-        array('rect',5,5,205,292),
+    // instrucțiuni de desenare
 
-        array('text','Linia',10,10,8,true),
-        array('text','Nume articol',20,10,8,true),
-        array('text','Preț net',95,10,8,true),
-        array('text','Moneda',115,10,8,true),
-        array('text','Cantitate',130,10,8,true),
-        array('text','U.M.',145,10,8,true),
-        array('text','Cota TVA',165,10,8,true),
-        array('text','Valoare netă',180,10,8,true),
+    $draw=array();
 
-        array('line',10,15.5,200,15.5),
-
-        array('text',"Pagina {{_page}}",5,290,8,false,array(205,'C','B')),
-        array('setY',17.5),
-        array('setVar','deltaY',-2.5),
-        array('_newPageBefore',array()),
-      )),
+    $draw[]=array('_newPageBefore',array(
+      array('text',"Pagina {{_page}}",5,290,8,false,array(205,'C','B')),
+    ));
+    $draw[]=array('_newPageAfter',array(
       array('rect',5,5,205,292),
 
-      // header
+      array('text','Linia',10,10,8,true),
+      array('text','Nume articol',20,10,8,true),
+      array('text','Preț net',95,10,8,true),
+      array('text','Moneda',115,10,8,true),
+      array('text','Cantitate',130,10,8,true),
+      array('text','U.M.',145,10,8,true),
+      array('text','Cota TVA',165,10,8,true),
+      array('text','Valoare netă',180,10,8,true),
 
-      array('text',"FACTURA ",10,10,12,true,null,false),
-      array('text',"{$factura['numar']} / {$factura['dataFactura']}",false,false,12,false),
-      array('text',"Tip document: {$factura['tip']}".(isset($tipuriDocument[$factura['tip']])?" ({$tipuriDocument[$factura['tip']]})":''),105,10,8,false,array(200,'R'),true),
-      array('text',"Instrument plată: {$factura['instrumentPlata']}".(isset($instrumentePlata[$factura['instrumentPlata']])?" ({$instrumentePlata[$factura['instrumentPlata']]})":''),105,false,8,false,array(200,'R')),
+      array('line',10,15.5,200,15.5),
 
-      // vânzător
+      array('text',"Pagina {{_page}}",5,290,8,false,array(205,'C','B')),
+      array('setY',17.5),
+      array('setVar','deltaY',-2.5),
+      array('_newPageBefore',array()),
+    ));
 
-      array('text','VÂNZĂTOR',15,22.5,10,true,array(97.5,'C')),
+    $draw[]=array('rect',5,5,205,292);
 
-      array('text','Nume',12.5,30,8,true),
-      array('text',$factura['firmaNume'],35,false,8,false,array(100,'L'),true),
+    // antet
 
-      array('text','Nr. Reg. Com.',12.5,false,8,true),
-      array('text',$factura['firmaNrRegCom'],35,false,8,false,array(100,'L'),true),
+    $hasLogo=false;
+    if (file_exists('logo/'.preg_replace('/[^0-9]+/','',$factura['firmaCIF']).'.png')) {
+      $draw[]=array('image','logo/'.preg_replace('/[^0-9]+/','',$factura['firmaCIF']).'.png',10,10,12);
+      $draw[]=array('moveX',2.5);
+      $hasLogo=true;
+    };
 
-      array('text','CIF',12.5,false,8,true),
-      array('text',$factura['firmaCIF'],35,false,8,false,array(100,'L'),true),
-
-      array('text','Adresă',12.5,false,8,true),
-      array('text',$factura['firmaAdresa'],35,false,8,false,array(100,'L'),true),
-
-      array('text','Localitate',12.5,false,8,true),
-      array('text',$factura['firmaLocalitate'],35,false,8,false,array(100,'L'),true),
-
-      array('text','Județ',12.5,false,8,true),
-      array('text',$factura['firmaJudet'],35,false,8,false,array(100,'L'),true),
-
-      array('text','Cont',12.5,false,8,true),
-      array('text',$factura['firmaCont']?$factura['firmaCont']:'-',35,false,8,false,array(100,'L'),true),
-
-      array('text','Cont (nume)',12.5,false,8,true),
-      array('text',$factura['firmaContNume']?$factura['firmaContNume']:'-',35,false,8,false,array(100,'L'),true),
-
-      array('text','Banca',12.5,false,8,true),
-      array('text',$factura['firmaBanca']?$factura['firmaBanca']:'-',35,false,8,false,array(100,'L'),true),
-
-      array('getY','vanzator'),
-
-      array('rect',10,20,102.5,'vanzator+2.5'),
-
-      // cumpărător
-
-      array('text','CUMPĂRĂTOR',112.5,22.5,10,true,array(195,'C')),
-
-      array('text','Nume',110,30,8,true),
-      array('text',$factura['nume'],132.5,false,8,false,array(197.5,'L'),true),
-
-      array('text','Nr. Reg. Com.',110,false,8,true),
-      array('text',$factura['nrRegCom'],132.5,false,8,false,array(197.5,'L'),true),
-
-      array('text','CIF',110,false,8,true),
-      array('text',$factura['CIF'],132.5,false,8,false,array(197.5,'L'),true),
-
-      array('text','Adresă',110,false,8,true),
-      array('text',$factura['adresa'],132.5,false,8,false,array(197.5,'L'),true),
-
-      array('text','Localitate',110,false,8,true),
-      array('text',$factura['localitate'],132.5,false,8,false,array(197.5,'L'),true),
-
-      array('text','Județ',110,false,8,true),
-      array('text',$factura['judet'],132.5,false,8,false,array(197.5,'L'),true),
-
-      array('rect',107.5,20,200,'vanzator+2.5'),
-
-      // header listă produse
-
-      array('text','Linia',10,'vanzator+7.5',8,true),
-      array('text','Nume articol',20,'vanzator+7.5',8,true),
-      array('text','Preț net',95,'vanzator+7.5',8,true),
-      array('text','Moneda',115,'vanzator+7.5',8,true),
-      array('text','Cantitate',130,'vanzator+7.5',8,true),
-      array('text','U.M.',145,'vanzator+7.5',8,true),
-      array('text','Cota TVA',165,'vanzator+7.5',8,true),
-      array('text','Valoare netă',180,'vanzator+7.5',8,true),
-
-      array('line',10,'vanzator+13',200,'vanzator+13'),
+    $draw[]=array('text',"FACTURA ",$hasLogo?false:10,$hasLogo?false:10,12,true,array(0,'L',$hasLogo?'M':'',12),false);
+    $draw[]=array('text',"{$factura['numar']} / {$factura['dataFactura']}",false,false,12,false,array(0,'L',$hasLogo?'M':'',12));
+    $draw[]=array(
+      'text',
+      "Tip document: {$factura['tip']}".(isset($tipuriDocument[$factura['tip']])?" ({$tipuriDocument[$factura['tip']]})":'')."\n".
+      "Instrument plată: {$factura['instrumentPlata']}".(isset($instrumentePlata[$factura['instrumentPlata']])?" ({$instrumentePlata[$factura['instrumentPlata']]})":''),
+      105,10,8,false,array(200,'R',$hasLogo?'M':'',12),true
     );
+    $draw[]=array('setVar','deltaY',$hasLogo?7:0);
+
+    // vânzător
+
+    $draw[]=array('text','VÂNZĂTOR',15,'deltaY+22.5',10,true,array(97.5,'C'));
+
+    $draw[]=array('text','Nume',12.5,'deltaY+30',8,true);
+    $draw[]=array('text',$factura['firmaNume'],35,false,8,false,array(100,'L'),true);
+
+    $draw[]=array('text','Nr. Reg. Com.',12.5,false,8,true);
+    $draw[]=array('text',$factura['firmaNrRegCom'],35,false,8,false,array(100,'L'),true);
+
+    $draw[]=array('text','CIF',12.5,false,8,true);
+    $draw[]=array('text',$factura['firmaCIF'],35,false,8,false,array(100,'L'),true);
+
+    $draw[]=array('text','Adresă',12.5,false,8,true);
+    $draw[]=array('text',$factura['firmaAdresa'],35,false,8,false,array(100,'L'),true);
+
+    $draw[]=array('text','Localitate',12.5,false,8,true);
+    $draw[]=array('text',$factura['firmaLocalitate'],35,false,8,false,array(100,'L'),true);
+
+    $draw[]=array('text','Județ',12.5,false,8,true);
+    $draw[]=array('text',$factura['firmaJudet'],35,false,8,false,array(100,'L'),true);
+
+    $draw[]=array('text','Cont',12.5,false,8,true);
+    $draw[]=array('text',$factura['firmaCont']?$factura['firmaCont']:'-',35,false,8,false,array(100,'L'),true);
+
+    $draw[]=array('text','Cont (nume)',12.5,false,8,true);
+    $draw[]=array('text',$factura['firmaContNume']?$factura['firmaContNume']:'-',35,false,8,false,array(100,'L'),true);
+
+    $draw[]=array('text','Banca',12.5,false,8,true);
+    $draw[]=array('text',$factura['firmaBanca']?$factura['firmaBanca']:'-',35,false,8,false,array(100,'L'),true);
+
+    $draw[]=array('getY','vanzator');
+
+    $draw[]=array('rect',10,'deltaY+20',102.5,'vanzator+2.5');
+
+    // cumpărător
+
+    $draw[]=array('text','CUMPĂRĂTOR',112.5,'deltaY+22.5',10,true,array(195,'C'));
+
+    $draw[]=array('text','Nume',110,'deltaY+30',8,true);
+    $draw[]=array('text',$factura['nume'],132.5,false,8,false,array(197.5,'L'),true);
+
+    $draw[]=array('text','Nr. Reg. Com.',110,false,8,true);
+    $draw[]=array('text',$factura['nrRegCom'],132.5,false,8,false,array(197.5,'L'),true);
+
+    $draw[]=array('text','CIF',110,false,8,true);
+    $draw[]=array('text',$factura['CIF'],132.5,false,8,false,array(197.5,'L'),true);
+
+    $draw[]=array('text','Adresă',110,false,8,true);
+    $draw[]=array('text',$factura['adresa'],132.5,false,8,false,array(197.5,'L'),true);
+
+    $draw[]=array('text','Localitate',110,false,8,true);
+    $draw[]=array('text',$factura['localitate'],132.5,false,8,false,array(197.5,'L'),true);
+
+    $draw[]=array('text','Județ',110,false,8,true);
+    $draw[]=array('text',$factura['judet'],132.5,false,8,false,array(197.5,'L'),true);
+
+    $draw[]=array('rect',107.5,'deltaY+20',200,'vanzator+2.5');
+
+    // antet listă produse
+
+    $draw[]=array('text','Linia',10,'vanzator+7.5',8,true);
+    $draw[]=array('text','Nume articol',20,'vanzator+7.5',8,true);
+    $draw[]=array('text','Preț net',95,'vanzator+7.5',8,true);
+    $draw[]=array('text','Moneda',115,'vanzator+7.5',8,true);
+    $draw[]=array('text','Cantitate',130,'vanzator+7.5',8,true);
+    $draw[]=array('text','U.M.',145,'vanzator+7.5',8,true);
+    $draw[]=array('text','Cota TVA',165,'vanzator+7.5',8,true);
+    $draw[]=array('text','Valoare netă',180,'vanzator+7.5',8,true);
+
+    $draw[]=array('line',10,'vanzator+13',200,'vanzator+13');
 
     $draw[]=array('setVar','deltaY',0);
 
@@ -459,9 +486,13 @@
 
     $draw[]=array('text',$factura['nota'],10,252,8,false,array(200,'L','B'));
 
+    // inițializează
+
     $vars=array(
       '_page'=>1,
     );
+
+    // desenează documentul
 
     foreach($draw as $t) {
       xml2pdfDraw($t,$pdf,$vars);
