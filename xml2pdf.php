@@ -95,6 +95,14 @@
             );
           }
 
+          $factura['fisiere']=array();
+          $files=$xml->xpath('//EmbeddedDocumentBinaryObject');
+          foreach($files as $file) {
+            if ((string)$file['mimeCode']==='application/pdf') {
+              $factura['fisiere'][]=base64_decode($file[0]);
+            }
+          }
+
           return $factura;
         } else {
           // Error: Invalid date
@@ -264,7 +272,11 @@
       'XPP'=>'buc.',
     );
 
-    $pdf=new TCPDF('P','mm','A4',true,'UTF-8',false);
+    if (class_exists('\setasign\Fpdi\Tcpdf\Fpdi') && count($factura['fisiere'])) {
+      $pdf=new setasign\Fpdi\Tcpdf\Fpdi('P','mm','A4',true,'UTF-8',false);
+    } else {
+      $pdf=new TCPDF('P','mm','A4',true,'UTF-8',false);
+    }
 
     $pdf->SetCreator(PDF_CREATOR);
     $pdf->SetAuthor('xml2pdf.php');
@@ -443,7 +455,7 @@
       array('setVar','deltaY',-2.5),
       array('text',"Pagina {{_page}}",5,290,8,false,array(205,'C','B')),
     ));
-    if ($factura['nota']) {
+    if (isset($factura['nota'])) {
       $draw[]=array('newPageIf',252,array($factura['nota'],200,8,false));
     } else {
       $draw[]=array('newPageIf',252);
@@ -484,7 +496,9 @@
       $draw[]=array('text',$factura['total'],5,false,12,true,array(205,'C'));
     }
 
-    $draw[]=array('text',$factura['nota'],10,252,8,false,array(200,'L','B'));
+    if (isset($factura['nota'])) {
+      $draw[]=array('text',$factura['nota'],10,252,8,false,array(200,'L','B'));
+    }
 
     // inițializează
 
@@ -496,6 +510,20 @@
 
     foreach($draw as $t) {
       xml2pdfDraw($t,$pdf,$vars);
+    }
+
+    // există fișiere PDF anexate?
+
+    if (class_exists('\setasign\Fpdi\Tcpdf\Fpdi') && count($factura['fisiere'])) {
+      foreach ($factura['fisiere'] as $file) {
+        $stream=setasign\Fpdi\PdfParser\StreamReader::createByString($file);
+        $pages=$pdf->setSourceFile($stream);
+        for ($i=0; $i<$pages; $i++) {
+          $pdf->AddPage();
+          $tplIdx=$pdf->importPage($i+1);
+          $pdf->useTemplate($tplIdx,0,0,210);
+        }
+      }
     }
 
     // întoarce PDF-ul, sau îl trimite inline în browser
