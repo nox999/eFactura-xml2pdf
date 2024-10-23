@@ -37,5 +37,4 @@ Se poate folosi template-ul existent sau se pot personaliza documentele cu ușur
 ![anaf](https://github.com/user-attachments/assets/64415533-7cd2-4152-9a45-5559fdaedf3f)
 
 ### Factură PDF generată de xml2pdf.php
-![xml2pdf](https://github.com/user-attachments/assets/8bbdb51f-dbd4-4598-9607-115957f78b1a)
-
+![xml2pdf](https://github.com/user-attachments/assets/b288b7f7-d3f2-4de6-9e58-8f3bf8c6f014)
