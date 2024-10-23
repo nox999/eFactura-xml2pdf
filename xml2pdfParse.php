@@ -1,5 +1,21 @@
 <?php
 
+  function xml2pdfParseID($a) { // extrage CIF și J din mai multe valori
+    $CIF='-';
+    $nrRegCom='-';
+
+    foreach ($a as $v) {
+      $v=str_replace(' ','',trim($v));
+      if (preg_match('/^(RO)?[0-9]{5,}$/',$v)) {
+        $CIF=$v;
+      } elseif (preg_match_all('/([JFC]{1}[0-9]{2}\/[0-9]+\/[0-9\.]+)/',$v,$matches)) {
+        $nrRegCom=$matches[0][0];
+      }
+    }
+
+    return array('CIF'=>$CIF,'nrRegCom'=>$nrRegCom);
+  }
+
   function xml2pdfParse($xmlString) { // parcurge un XML eFactură și extrage câmpurile relevante într-un array
     $judete=array(
       'AB'=>'Alba','AR'=>'Arad','AG'=>'Arges','BC'=>'Bacau','BH'=>'Bihor','BN'=>'Bistrita-Nasaud','BT'=>'Botosani','BR'=>'Braila','BV'=>'Brasov','B'=>'Bucuresti','BZ'=>'Buzau','CL'=>'Calarasi',
@@ -20,10 +36,16 @@
           list($y,$m,$d)=explode('-',$dataFactura);
           $numar=(string)$xml->xpath('//ID')[0][0];
 
+          $dateCompanie=xml2pdfParseID(array(
+            count($xml->xpath('/Invoice/AccountingCustomerParty/Party/PartyIdentification/ID'))?(string)$xml->xpath('/Invoice/AccountingCustomerParty/Party/PartyIdentification/ID')[0][0]:'',
+            count($xml->xpath('/Invoice/AccountingCustomerParty/Party/PartyLegalEntity/CompanyID'))?(string)$xml->xpath('/Invoice/AccountingCustomerParty/Party/PartyLegalEntity/CompanyID')[0][0]:'',
+            count($xml->xpath('/Invoice/AccountingCustomerParty/Party/PartyTaxScheme/CompanyID'))?(string)$xml->xpath('/Invoice/AccountingCustomerParty/Party/PartyTaxScheme/CompanyID')[0][0]:'',
+          ));
+
           $factura=array(
             'nume'=>(string)$xml->xpath('//AccountingCustomerParty/Party/PartyLegalEntity/RegistrationName')[0][0],
-            'nrRegCom'=>count($xml->xpath('//AccountingCustomerParty/Party/PartyLegalEntity/CompanyID'))?str_replace(' ','',(string)$xml->xpath('//AccountingCustomerParty/Party/PartyLegalEntity/CompanyID')[0][0]):'-',
-            'CIF'=>count($xml->xpath('//AccountingCustomerParty/Party/PartyTaxScheme/CompanyID'))?str_replace(' ','',(string)$xml->xpath('//AccountingCustomerParty/Party/PartyTaxScheme/CompanyID')[0][0]):'-',
+            'nrRegCom'=>$dateCompanie['nrRegCom'],
+            'CIF'=>$dateCompanie['CIF'],
             'adresa'=>(string)$xml->xpath('//AccountingCustomerParty/Party/PostalAddress/StreetName')[0][0],
             'localitate'=>preg_replace('/(SECTOR)([0-9]{1})/','Sector \\2',(string)$xml->xpath('//AccountingCustomerParty/Party/PostalAddress/CityName')[0][0]),
             'judet'=>$judete[preg_replace('/^(RO-)/','',(string)$xml->xpath('//AccountingCustomerParty/Party/PostalAddress/CountrySubentity')[0][0])],
@@ -58,9 +80,16 @@
           }
           $factura['total']=$factura['totalTVA']+$factura['totalFaraTVA'];
 
+          $dateCompanie=xml2pdfParseID(array(
+            count($xml->xpath('/Invoice/AccountingSupplierParty/Party/PartyIdentification/ID'))?(string)$xml->xpath('/Invoice/AccountingSupplierParty/Party/PartyIdentification/ID')[0][0]:'',
+            count($xml->xpath('/Invoice/AccountingSupplierParty/Party/PartyLegalEntity/CompanyID'))?(string)$xml->xpath('/Invoice/AccountingSupplierParty/Party/PartyLegalEntity/CompanyID')[0][0]:'',
+            count($xml->xpath('/Invoice/AccountingSupplierParty/Party/PartyLegalEntity/CompanyLegalForm'))?(string)$xml->xpath('/Invoice/AccountingSupplierParty/Party/PartyLegalEntity/CompanyLegalForm')[0][0]:'',
+            count($xml->xpath('/Invoice/AccountingSupplierParty/Party/PartyTaxScheme/CompanyID'))?(string)$xml->xpath('/Invoice/AccountingSupplierParty/Party/PartyTaxScheme/CompanyID')[0][0]:'',
+          ));
+
           $factura['firmaNume']=(string)$xml->xpath('//AccountingSupplierParty/Party/PartyLegalEntity/RegistrationName')[0][0];
-          $factura['firmaNrRegCom']=count($xml->xpath('//AccountingSupplierParty/Party/PartyLegalEntity/CompanyID'))?str_replace(' ','',(string)$xml->xpath('//AccountingSupplierParty/Party/PartyLegalEntity/CompanyID')[0][0]):'';
-          $factura['firmaCIF']=(string)$xml->xpath('//AccountingSupplierParty/Party/PartyTaxScheme/CompanyID')[0][0];
+          $factura['firmaNrRegCom']=$dateCompanie['nrRegCom'];
+          $factura['firmaCIF']=$dateCompanie['CIF'];
           $factura['firmaAdresa']=(string)$xml->xpath('//AccountingSupplierParty/Party/PostalAddress/StreetName')[0][0];
           $factura['firmaLocalitate']=preg_replace('/(SECTOR)([0-9]{1})/','Sector \\2',(string)$xml->xpath('//AccountingSupplierParty/Party/PostalAddress/CityName')[0][0]);
           $factura['firmaJudet']=$judete[preg_replace('/^(RO-)/','',(string)$xml->xpath('//AccountingSupplierParty/Party/PostalAddress/CountrySubentity')[0][0])];
