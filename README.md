@@ -4,6 +4,7 @@ Librărie PHP care transformă documentele eFactură din format XML în format P
 Ministerul de Finanțe pune la dispoziție o ["aplicație"](https://www.anaf.ro/uploadxml/) care transformă facturile din XML în PDF (serviciu disponibil și prin API). Din păcate rezultatele pe care le produce sunt aproape ilizibile și complet deconectate de ce ar avea nevoie o companie reală - un obstacol inutil pentru cei care vor să-și facă singuri implementarea eFactură. Pentru că standardul este stufos, redundant, prost documentat, ambiguu și implementat în grabă, scopul acestui proiect este să acopere marea majoritate a cazurilor de folosire fără să intre în scenarii de nișă.
 ## De ce să-l folosești?
 * Generează fișiere PDF lizibile;
+* Nu depinde de disponibilitatea serverelor ANAF;
 * Ușor de personalizat;
 * Simplu și flexibil (tot codul este procedural și comentat);
 * Nu se folosesc alte librării externe în afară de [TCPDF](https://github.com/tecnickcom/tcpdf). Dacă se dorește atașarea anexelor în format PDF incluse în XML este necesară și includerea [FPDI](https://github.com/Setasign/FPDI);
