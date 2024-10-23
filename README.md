@@ -31,11 +31,11 @@ Ministerul de Finanțe pune la dispoziție o ["aplicație"](https://www.anaf.ro/
 ?>
 ```
 ## Cum arată documentele generate?
-Deoarece **TCPDF** este o librărie complexă și presupune o oarecare experiență în folosire pentru rezultate optime, am creat o serie de instrucțiuni de bază (text, linie, dreptunghi etc) care se utilizează în generarea documentului. Drept urmare nu este necesară învățarea **TCPDF** pentru personalizarea documentelor.
+Se poate folosi template-ul existent sau se pot personaliza documentele cu ușurință, fără a fi necesară învățarea librăriei **TCPDF**.
 
-### Factură PDF generată pe mfinante.ro
-![anaf](https://github.com/user-attachments/assets/fe07d762-477f-4a77-9f05-fc1699f2faba)
+### Factură PDF generată pe anaf.ro/uploadxml
+![anaf](https://github.com/user-attachments/assets/64415533-7cd2-4152-9a45-5559fdaedf3f)
 
 ### Factură PDF generată de xml2pdf.php
-![xml2pdf](https://github.com/user-attachments/assets/efe646bf-8ec4-4598-a3a0-457391db4dff)
+![xml2pdf](https://github.com/user-attachments/assets/8bbdb51f-dbd4-4598-9607-115957f78b1a)
 
