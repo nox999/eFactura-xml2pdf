@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" xmlns:ccts="urn:un:unece:uncefact:documentation:2" xmlns:qdt="urn:oasis:names:specification:ubl:schema:xsd:QualifiedDataTypes-2" xmlns:udt="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2">
+  <cbc:UBLVersionID>2.1</cbc:UBLVersionID>
+  <cbc:CustomizationID>urn:cen.eu:en16931:2017#compliant#urn:efactura.mfinante.ro:CIUS-RO:1.0.1</cbc:CustomizationID>
+  <cbc:ID>PROD 69420</cbc:ID>
+  <cbc:IssueDate>2024-09-10</cbc:IssueDate>
+  <cbc:DueDate>2024-09-10</cbc:DueDate>
+  <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>
+  <cbc:Note>Acesta este un câmp unde pot apărea informații suplimentare despre factură, despre plată, produse etc.</cbc:Note>
+  <cbc:TaxPointDate>2024-09-10</cbc:TaxPointDate>
+  <cbc:DocumentCurrencyCode>RON</cbc:DocumentCurrencyCode>
+  <cac:AdditionalDocumentReference>
+    <cbc:ID>1</cbc:ID>
+    <cac:Attachment>
+      <cbc:EmbeddedDocumentBinaryObject mimeCode="application/pdf" filename="anexa.pdf">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NTYgNTU2IDU1NiAzMzMgNTAwIDI3OCA1NTYgNTAwXQo5MVs1MDBdCjQyMzJbNzUzXQpdPj4KZW5kb2JqCjIwIDAgb2JqCjw8L1R5cGUvRm9udERlc2NyaXB0b3IvRmxhZ3MgMzIvQXNjZW50IDcyOC9DYXBIZWlnaHQgNzE2L0Rlc2NlbnQgLTIxMC9Gb250QkJveFstNjY1IC0zMjUgMjAwMCAxMDQwXS9Gb250TmFtZS9BcmlhbE1UL0l0YWxpY0FuZ2xlIDAvU3RlbVYgODgvWEhlaWdodCA1MTk+PgplbmRvYmoKNiAwIG9iago8PC9UeXBlL0V4dEdTdGF0ZS9PUCBmYWxzZS9vcCBmYWxzZS9PUE0gMT4+CmVuZG9iago3IDAgb2JqCjw8L1R5cGUvRXh0R1N0YXRlL1NNYXNrL05vbmU+PgplbmRvYmoKOCAwIG9iago8PC9UeXBlL0V4dEdTdGF0ZS9MQyAxL0xKIDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL0NvbnRlbnRzIDUgMCBSL1Jlc291cmNlcyA5IDAgUi9NZWRpYUJveFswIDAgNTk1LjQ0IDg0MS45Ml0+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0NvdW50IDEvS2lkc1sgMyAwIFJdPj4KZW5kb2JqCjIyIDAgb2JqCjw8L0xlbmd0aCAyMSAwIFIvVHlwZS9NZXRhZGF0YS9TdWJ0eXBlL1hNTD4+CnN0cmVhbQo8P3hwYWNrZXQgYmVnaW49Iu+7vyIgaWQ9Ilc1TTBNcENlaGlIenJlU3pOVGN6a2M5ZCI/PgogICAgPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyI+CiAgICAgIDxyZGY6UkRGIHhtbG5zOnJkZj0iaHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyI+CiAgICAgICAgPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iPgogICAgICAgICAgPHhtcE1NOkluc3RhbmNlSUQ+dXVpZDo5RkIzOTFBNy0yMTQ2LUVDNjktNDZCMS03M0U1MkUxREU1ODQ8L3htcE1NOkluc3RhbmNlSUQ+CiAgICAgICAgICA8eG1wTU06RG9jdW1lbnRJRD51dWlkOkFGNkQwOTdCLTE2MkYtMkIzNS0xQjVELUU3RDFFOEU4NDYzQjwveG1wTU06RG9jdW1lbnRJRD4KICAgICAgICA8L3JkZjpEZXNjcmlwdGlvbj4KICAgICAgICA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iPgogICAgICAgICAgPHhtcDpDcmVhdGVEYXRlPjIwMjQtMTAtMjNUMTA6MTQ6NDYrMDM6MDA8L3htcDpDcmVhdGVEYXRlPgogICAgICAgICAgPHhtcDpDcmVhdG9yVG9vbD5TZXJpZiBBZmZpbml0eSBEZXNpZ25lciAyIDIuNS41PC94bXA6Q3JlYXRvclRvb2w+CiAgICAgICAgICA8eG1wOk1ldGFkYXRhRGF0ZT4yMDI0LTEwLTIzVDEwOjE0OjQ2KzAzOjAwPC94bXA6TWV0YWRhdGFEYXRlPgogICAgICAgIDwvcmRmOkRlc2NyaXB0aW9uPgogICAgICAgIDxyZGY6RGVzY3JpcHRpb24gcmRmOmFib3V0PSIiIHhtbG5zOnBkZj0iaHR0cDovL25zLmFkb2JlLmNvbS9wZGYvMS4zLyI+CiAgICAgICAgICA8cGRmOlByb2R1Y2VyPlBERmxpYitQREkgMTAuMC4wcDEtaSAoV2luMzIpPC9wZGY6UHJvZHVjZXI+CiAgICAgICAgPC9yZGY6RGVzY3JpcHRpb24+CiAgICAgICAgPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6cGRmeD0iaHR0cDovL25zLmFkb2JlLmNvbS9wZGZ4LzEuMy8iPgogICAgICAgICAgPHBkZng6dHJhcHBlZD5mYWxzZTwvcGRmeDp0cmFwcGVkPgogICAgICAgIDwvcmRmOkRlc2NyaXB0aW9uPgogICAgICAgIDxyZGY6RGVzY3JpcHRpb24gcmRmOmFib3V0PSIiIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyI+CiAgICAgICAgICA8ZGM6dGl0bGU+CiAgICAgICAgICAgIDxyZGY6QWx0PgogICAgICAgICAgICAgIDxyZGY6bGkgeG1sOmxhbmc9IngtZGVmYXVsdCI+ZG9jdW1lbnQucGRmPC9yZGY6bGk+CiAgICAgICAgICAgIDwvcmRmOkFsdD4KICAgICAgICAgIDwvZGM6dGl0bGU+CiAgICAgICAgPC9yZGY6RGVzY3JpcHRpb24+CiAgICAgIDwvcmRmOlJERj4KICAgIDwveDp4bXBtZXRhPgo8P3hwYWNrZXQgZW5kPSJyIj8+CmVuZHN0cmVhbQplbmRvYmoKMjEgMCBvYmoKMTQyOQplbmRvYmoKMjMgMCBvYmoKPDwvVHlwZS9DYXRhbG9nL1BhZ2VzIDIgMCBSL01ldGFkYXRhIDIyIDAgUj4+CmVuZG9iagp4cmVmCjAgMjQKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDE1IDAwMDAwIG4gCjAwMDAwMDU4ODMgMDAwMDAgbiAKMDAwMDAwNTc4MSAwMDAwMCBuIAowMDAwMDAzMTgyIDAwMDAwIG4gCjAwMDAwMDAwNjMgMDAwMDAgbiAKMDAwMDAwNTYzMSAwMDAwMCBuIAowMDAwMDA1NjkwIDAwMDAwIG4gCjAwMDAwMDU3MzYgMDAwMDAgbiAKMDAwMDAwMzIwMiAwMDAwMCBuIAowMDAwMDAzNDg2IDAwMDAwIG4gCjAwMDAwMDQ0NDcgMDAwMDAgbiAKMDAwMDAwMzMwOSAwMDAwMCBuIAowMDAwMDAzNjE1IDAwMDAwIG4gCjAwMDAwMDM5OTcgMDAwMDAgbiAKMDAwMDAwMzk3NyAwMDAwMCBuIAowMDAwMDA0MjY3IDAwMDAwIG4gCjAwMDAwMDQ1NzEgMDAwMDAgbiAKMDAwMDAwNTA3NCAwMDAwMCBuIAowMDAwMDA1MDU0IDAwMDAwIG4gCjAwMDAwMDU0NjEgMDAwMDAgbiAKMDAwMDAwNzQ0MyAwMDAwMCBuIAowMDAwMDA1OTM1IDAwMDAwIG4gCjAwMDAwMDc0NjQgMDAwMDAgbiAKdHJhaWxlcgo8PC9TaXplIDI0L1Jvb3QgMjMgMCBSL0luZm8gMTIgMCBSL0lEWzw1NEY5NjFBRTBFMkMwQzYyMjc4MDRFNDc0NTg1RDY4RT48NTRGOTYxQUUwRTJDMEM2MjI3ODA0RTQ3NDU4NUQ2OEU+XT4+CnN0YXJ0eHJlZgo3NTI2CiUlRU9GCg==</cbc:EmbeddedDocumentBinaryObject>
+    </cac:Attachment>
+  </cac:AdditionalDocumentReference>
+  <cac:AccountingSupplierParty>
+    <cac:Party>
+      <cac:PostalAddress>
+        <cbc:StreetName>Strada Speranței, Parter, București</cbc:StreetName>
+        <cbc:CityName>SECTOR2</cbc:CityName>
+        <cbc:CountrySubentity>RO-B</cbc:CountrySubentity>
+        <cac:Country>
+          <cbc:IdentificationCode>RO</cbc:IdentificationCode>
+        </cac:Country>
+      </cac:PostalAddress>
+      <cac:PartyTaxScheme>
+        <cbc:CompanyID>RO123456</cbc:CompanyID>
+        <cac:TaxScheme>
+          <cbc:ID>VAT</cbc:ID>
+        </cac:TaxScheme>
+      </cac:PartyTaxScheme>
+      <cac:PartyLegalEntity>
+        <cbc:RegistrationName>S.C. Vânzător S.R.L.</cbc:RegistrationName>
+        <cbc:CompanyID>J40/1234/2024</cbc:CompanyID>
+      </cac:PartyLegalEntity>
+    </cac:Party>
+  </cac:AccountingSupplierParty>
+  <cac:AccountingCustomerParty>
+    <cac:Party>
+      <cac:PartyIdentification>
+        <cbc:ID>J40/5678/2020</cbc:ID>
+      </cac:PartyIdentification>
+      <cac:PostalAddress>
+        <cbc:StreetName>Str. Viorelelor, nr. 13</cbc:StreetName>
+        <cbc:CityName>SECTOR6</cbc:CityName>
+        <cbc:CountrySubentity>RO-B</cbc:CountrySubentity>
+        <cac:Country>
+          <cbc:IdentificationCode>RO</cbc:IdentificationCode>
+        </cac:Country>
+      </cac:PostalAddress>
+      <cac:PartyTaxScheme>
+        <cbc:CompanyID>RO7891011</cbc:CompanyID>
+        <cac:TaxScheme>
+          <cbc:ID>VAT</cbc:ID>
+        </cac:TaxScheme>
+      </cac:PartyTaxScheme>
+      <cac:PartyLegalEntity>
+        <cbc:RegistrationName>S.C. Cumpărător S.R.L.</cbc:RegistrationName>
+      </cac:PartyLegalEntity>
+    </cac:Party>
+  </cac:AccountingCustomerParty>
+  <cac:PaymentMeans>
+    <cbc:PaymentMeansCode>42</cbc:PaymentMeansCode>
+    <cac:PayeeFinancialAccount>
+      <cbc:ID>RO01BTRLRONCRT0123456701</cbc:ID>
+      <cbc:Name>Cont Banca Transilvania în RON</cbc:Name>
+      <cac:FinancialInstitutionBranch>
+        <cbc:ID>Banca Transilvania</cbc:ID>
+      </cac:FinancialInstitutionBranch>
+    </cac:PayeeFinancialAccount>
+  </cac:PaymentMeans>
+  <cac:TaxTotal>
+    <cbc:TaxAmount currencyID="RON">19.05</cbc:TaxAmount>
+    <cac:TaxSubtotal>
+      <cbc:TaxableAmount currencyID="RON">16.51</cbc:TaxableAmount>
+      <cbc:TaxAmount currencyID="RON">1.49</cbc:TaxAmount>
+      <cac:TaxCategory>
+        <cbc:ID>S</cbc:ID>
+        <cbc:Percent>9</cbc:Percent>
+        <cac:TaxScheme>
+          <cbc:ID>VAT</cbc:ID>
+        </cac:TaxScheme>
+      </cac:TaxCategory>
+    </cac:TaxSubtotal>
+    <cac:TaxSubtotal>
+      <cbc:TaxableAmount currencyID="RON">92.44</cbc:TaxableAmount>
+      <cbc:TaxAmount currencyID="RON">17.56</cbc:TaxAmount>
+      <cac:TaxCategory>
+        <cbc:ID>S</cbc:ID>
+        <cbc:Percent>19</cbc:Percent>
+        <cac:TaxScheme>
+          <cbc:ID>VAT</cbc:ID>
+        </cac:TaxScheme>
+      </cac:TaxCategory>
+    </cac:TaxSubtotal>
+  </cac:TaxTotal>
+  <cac:LegalMonetaryTotal>
+    <cbc:LineExtensionAmount currencyID="RON">108.95</cbc:LineExtensionAmount>
+    <cbc:TaxExclusiveAmount currencyID="RON">108.95</cbc:TaxExclusiveAmount>
+    <cbc:TaxInclusiveAmount currencyID="RON">128.00</cbc:TaxInclusiveAmount>
+    <cbc:PayableAmount currencyID="RON">128.00</cbc:PayableAmount>
+  </cac:LegalMonetaryTotal>
+  <cac:InvoiceLine>
+    <cbc:ID>1</cbc:ID>
+    <cbc:Note>Fiecare produs poate avea o notă. Acest produs, spre exemplu, este de nota 10.</cbc:Note>
+    <cbc:InvoicedQuantity unitCode="H87">15.000</cbc:InvoicedQuantity>
+    <cbc:LineExtensionAmount currencyID="RON">50.42</cbc:LineExtensionAmount>
+    <cac:Item>
+      <cbc:Description>Descrierea produsului</cbc:Description>
+      <cbc:Name>Titlul produsului</cbc:Name>
+      <cac:SellersItemIdentification>
+        <cbc:ID>69-420</cbc:ID>
+      </cac:SellersItemIdentification>
+      <cac:ClassifiedTaxCategory>
+        <cbc:ID>S</cbc:ID>
+        <cbc:Percent>19</cbc:Percent>
+        <cac:TaxScheme>
+          <cbc:ID>VAT</cbc:ID>
+        </cac:TaxScheme>
+      </cac:ClassifiedTaxCategory>
+    </cac:Item>
+    <cac:Price>
+      <cbc:PriceAmount currencyID="RON">3.3612</cbc:PriceAmount>
+    </cac:Price>
+  </cac:InvoiceLine>
+  <cac:InvoiceLine>
+    <cbc:ID>2</cbc:ID>
+    <cbc:InvoicedQuantity unitCode="H87">10.000</cbc:InvoicedQuantity>
+    <cbc:LineExtensionAmount currencyID="RON">42.02</cbc:LineExtensionAmount>
+    <cac:Item>
+      <cbc:Name>Un produs excepțional</cbc:Name>
+      <cac:ClassifiedTaxCategory>
+        <cbc:ID>S</cbc:ID>
+        <cbc:Percent>19</cbc:Percent>
+        <cac:TaxScheme>
+          <cbc:ID>VAT</cbc:ID>
+        </cac:TaxScheme>
+      </cac:ClassifiedTaxCategory>
+    </cac:Item>
+    <cac:Price>
+      <cbc:PriceAmount currencyID="RON">4.2020</cbc:PriceAmount>
+    </cac:Price>
+  </cac:InvoiceLine>
+  <cac:InvoiceLine>
+    <cbc:ID>3</cbc:ID>
+    <cbc:InvoicedQuantity unitCode="H87">1.000</cbc:InvoicedQuantity>
+    <cbc:LineExtensionAmount currencyID="RON">9.17</cbc:LineExtensionAmount>
+    <cac:Item>
+      <cbc:Name>Produs cu TVA redus</cbc:Name>
+      <cac:ClassifiedTaxCategory>
+        <cbc:ID>S</cbc:ID>
+        <cbc:Percent>9</cbc:Percent>
+        <cac:TaxScheme>
+          <cbc:ID>VAT</cbc:ID>
+        </cac:TaxScheme>
+      </cac:ClassifiedTaxCategory>
+    </cac:Item>
+    <cac:Price>
+      <cbc:PriceAmount currencyID="RON">9.1700</cbc:PriceAmount>
+    </cac:Price>
+  </cac:InvoiceLine>
+  <cac:InvoiceLine>
+    <cbc:ID>4</cbc:ID>
+    <cbc:InvoicedQuantity unitCode="XBE">1.000</cbc:InvoicedQuantity>
+    <cbc:LineExtensionAmount currencyID="RON">7.34</cbc:LineExtensionAmount>
+    <cac:Item>
+      <cbc:Name>Un alt produs</cbc:Name>
+      <cac:ClassifiedTaxCategory>
+        <cbc:ID>S</cbc:ID>
+        <cbc:Percent>9</cbc:Percent>
+        <cac:TaxScheme>
+          <cbc:ID>VAT</cbc:ID>
+        </cac:TaxScheme>
+      </cac:ClassifiedTaxCategory>
+    </cac:Item>
+    <cac:Price>
+      <cbc:PriceAmount currencyID="RON">7.3400</cbc:PriceAmount>
+    </cac:Price>
+  </cac:InvoiceLine>
+</Invoice>
