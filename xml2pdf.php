@@ -91,8 +91,8 @@
     // antet
 
     $hasLogo=false;
-    if (file_exists('logo/'.preg_replace('/[^0-9]+/','',$factura['firmaCIF']).'.png')) {
-      $draw[]=array('image','logo/'.preg_replace('/[^0-9]+/','',$factura['firmaCIF']).'.png',10,10,12);
+    if (file_exists(dirname(__FILE__).'/logo/'.preg_replace('/[^0-9]+/','',$factura['firmaCIF']).'.png')) {
+      $draw[]=array('image',dirname(__FILE__).'/logo/'.preg_replace('/[^0-9]+/','',$factura['firmaCIF']).'.png',10,10,12);
       $draw[]=array('moveX',2.5);
       $hasLogo=true;
     };
