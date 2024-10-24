@@ -13,7 +13,7 @@
   require_once('xml2pdfDraw.php');
   require_once('xml2pdfParse.php');
 
-  function xml2pdfRender($factura,$return=false) { // generează document PDF pornind de la un array factură
+  function xml2pdfRender($factura,$return=false,$titlu='factura-{{data}}') { // generează document PDF pornind de la un array factură
 
     // cele mai comune tipuri de documente, instrumente de plată și unități de măsură, la restul se afișează doar codul
 
@@ -285,10 +285,16 @@
 
     // întoarce documentul PDF, sau îl trimite inline în browser
 
+    $fileName=preg_replace('/[<>:"\/\\\|\?\*]/','',trim(str_replace(
+      array('{{data}}','{{numar}}','{{furnizor}}'),
+      array($factura['dataFactura'],$factura['numar'],$factura['firmaNume']),
+      $titlu
+    )));
+
     if ($return) {
-      return $pdf->Output('factura-'.$factura['dataFactura'].'.pdf','S');
+      return $pdf->Output($fileName.'.pdf','S');
     } else {
-      $pdf->Output('factura-'.$factura['dataFactura'].'.pdf','I');
+      $pdf->Output($fileName.'.pdf','I');
     }
   }
 
