@@ -11,8 +11,6 @@
     exit('Eroare la parcurgerea fișierului XML.');
   }
 
-  $r=xml2pdfRender($factura,true);
-  header("Content-type:application/pdf");
-  echo $r;
+  xml2pdfRender($factura,false,'factura {{furnizor}} ({{numar}} din {{data}})');
 
 ?>
