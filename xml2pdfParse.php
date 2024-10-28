@@ -32,6 +32,27 @@
       'TR'=>'Teleorman','TM'=>'Timis','TL'=>'Tulcea','VL'=>'Valcea','VS'=>'Vaslui','VN'=>'Vrancea'
     );
 
+    // cele mai comune tipuri de documente, instrumente de plată și unități de măsură, la restul se afișează doar codul
+
+    $tipuriDocument=array('-'=>'Nedefinit','380'=>'Factură','751'=>'Factură - informații în scopuri contabile');
+    $instrumentePlata=array('1'=>'Nespecificat','10'=>'Numerar','42'=>'Ordin de plată','48'=>'Card bancar','54'=>'Card de credit','55'=>'Card de debit','68'=>'Plata online','ZZZ'=>'Instrument agreat');
+    $unitati=array(
+      'C62'=>'unitate',
+      'EA'=>'unitate',
+      'GRM'=>'gr.',
+      'H87'=>'buc.',
+      'HUR'=>'oră',
+      'KGM'=>'kg.',
+      'KWH'=>'kw. oră',
+      'M4'=>'val. monetară',
+      'MON'=>'lună',
+      'MTQ'=>'metru cub',
+      'MTR'=>'metru',
+      'SET'=>'set',
+      'XBE'=>'pachet',
+      'XPP'=>'buc.',
+    );
+
     $xmlString=preg_replace('/( (xmlns|xsi)(:[a-zA-Z0-9]+){0,1}="[^"]+")/','',$xmlString);
     $xmlString=str_replace(array('<cbc:','</cbc:','<cac:','</cac:','<ubl:','</ubl:'),array('<','</','<','</','<','</'),$xmlString);
     $xml=simplexml_load_string($xmlString);
@@ -66,7 +87,13 @@
           $factura['dataFactura']=$dataFactura;
           $factura['numar']=$numar;
           $factura['tip']=(string)$xml->xpath('//InvoiceTypeCode')[0][0];
+          if (isset($tipuriDocument[$factura['tip']])) {
+            $factura['tipText']=$tipuriDocument[$factura['tip']];
+          }
           $factura['instrumentPlata']=count($xml->xpath('//PaymentMeans/PaymentMeansCode'))?(string)$xml->xpath('//PaymentMeans/PaymentMeansCode')[0][0]:'-';
+          if (isset($instrumentePlata[$factura['instrumentPlata']])) {
+            $factura['instrumentPlataText']=$instrumentePlata[$factura['instrumentPlata']];
+          }
           if (count($xml->xpath('/Invoice/Note'))) {
             $factura['nota']='';
             for ($i=0; $i<count($xml->xpath('/Invoice/Note')); $i++) {
@@ -108,7 +135,7 @@
           $factura['produse']=array();
           $lines=$xml->xpath('//InvoiceLine');
           foreach($lines as $line) {
-            $factura['produse'][]=array(
+            $produs=array(
               'produs'=>trim((string)$line->Item->Name),
               'descriere'=>trim((string)$line->Item->Description),
               'nota'=>trim((string)$line->Note),
@@ -120,6 +147,10 @@
               'TVA'=>(float)$line->Item->ClassifiedTaxCategory->Percent,
               'totalFaraTVA'=>(float)$line->LineExtensionAmount,
             );
+            if (isset($unitati[$produs['um']])) {
+              $produs['umText']=$unitati[$produs['um']];
+            }
+            $factura['produse'][]=$produs;
           }
 
           $factura['fisiere']=array();
