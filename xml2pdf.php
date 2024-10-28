@@ -13,54 +13,7 @@
   require_once('xml2pdfDraw.php');
   require_once('xml2pdfParse.php');
 
-  function xml2pdfRender($factura,$return=false,$titlu='factura-{{data}}') { // generează document PDF pornind de la un array factură
-
-    // cele mai comune tipuri de documente, instrumente de plată și unități de măsură, la restul se afișează doar codul
-
-    $tipuriDocument=array('-'=>'Nedefinit','380'=>'Factură','751'=>'Factură - informații în scopuri contabile');
-    $instrumentePlata=array('1'=>'Nespecificat','10'=>'Numerar','42'=>'Ordin de plată','48'=>'Card bancar','54'=>'Card de credit','55'=>'Card de debit','68'=>'Plata online','ZZZ'=>'Instrument agreat');
-    $unitati=array(
-      'C62'=>'unitate',
-      'EA'=>'unitate',
-      'GRM'=>'gr.',
-      'H87'=>'buc.',
-      'HUR'=>'oră',
-      'KGM'=>'kg.',
-      'KWH'=>'kw. oră',
-      'M4'=>'val. monetară',
-      'MON'=>'lună',
-      'MTQ'=>'metru cub',
-      'MTR'=>'metru',
-      'SET'=>'set',
-      'XBE'=>'pachet',
-      'XPP'=>'buc.',
-    );
-
-    // inițializează document PDF
-
-    if (class_exists('\setasign\Fpdi\Tcpdf\Fpdi') && count($factura['fisiere'])) {
-      $pdf=new setasign\Fpdi\Tcpdf\Fpdi('P','mm','A4',true,'UTF-8',false);
-    } else {
-      $pdf=new TCPDF('P','mm','A4',true,'UTF-8',false);
-    }
-
-    $pdf->SetCreator(PDF_CREATOR);
-    $pdf->SetAuthor('xml2pdf.php');
-    $pdf->SetTitle('Factura '.$factura['firmaNume'].' din '.$factura['dataFactura']);
-
-    $pdf->SetMargins(0,0,0);
-    $pdf->setCellPadding(0);
-    $pdf->setImageScale(1);
-    $pdf->setPrintHeader(false);
-    $pdf->setPrintFooter(false);
-    $pdf->SetAutoPageBreak(false);
-
-    // creează prima pagină
-
-    $pdf->AddPage();
-
-    // instrucțiuni de desenare
-
+  function xml2pdfRender($factura,$return=false,$titlu='factura-{{data}}') { // generează instrucțiunile de desenare pornind de la un array factură
     $draw=array();
 
     $draw[]=array('_newPageBefore',array(
@@ -101,8 +54,8 @@
     $draw[]=array('text',"{$factura['numar']} / {$factura['dataFactura']}",false,false,12,false,array(0,'L',$hasLogo?'M':'',12));
     $draw[]=array(
       'text',
-      "Tip document: {$factura['tip']}".(isset($tipuriDocument[$factura['tip']])?" ({$tipuriDocument[$factura['tip']]})":'')."\n".
-      "Instrument plată: {$factura['instrumentPlata']}".(isset($instrumentePlata[$factura['instrumentPlata']])?" ({$instrumentePlata[$factura['instrumentPlata']]})":''),
+      "Tip document: {$factura['tip']}".(isset($factura['tipText'])?" ({$factura['tipText']})":'')."\n".
+      "Instrument plată: {$factura['instrumentPlata']}".(isset($factura['instrumentPlataText'])?" ({$factura['instrumentPlataText']})":''),
       105,10,8,false,array(200,'R',$hasLogo?'M':'',12),true
     );
     $draw[]=array('setVar','deltaY',$hasLogo?7:0);
@@ -202,7 +155,7 @@
       $draw[]=array('text',$p['pretFaraTVA'],95,$y,8,false);
       $draw[]=array('text',$p['moneda'],115,$y,8,false);
       $draw[]=array('text',$p['cantitate'],130,$y,8,false);
-      $draw[]=array('text',$p['um'].(isset($unitati[$p['um']])?" ({$unitati[$p['um']]})":''),145,$y,8,false);
+      $draw[]=array('text',$p['um'].(isset($p['umText'])?" ({$p['umText']})":''),145,$y,8,false);
       $draw[]=array('text',$p['TVA'].'%',165,$y,8,false);
       $draw[]=array('text',$p['totalFaraTVA'],180,$y,8,false);
       $draw[]=array('text',$produs,20,$y,8,$produsInfo?true:false,array(90,'L'),true);
@@ -264,38 +217,21 @@
       $draw[]=array('text',$factura['nota'],10,252,8,false,array(200,'L','B'));
     }
 
-    // procesează instrucțiunile de desenare
-
-    xml2pdfDrawInit($pdf,$vars);
-    xml2pdfDrawAll($draw,$pdf,$vars);
-
-    // dacă există adaugă fișiere PDF anexate
-
-    if (class_exists('\setasign\Fpdi\Tcpdf\Fpdi') && count($factura['fisiere'])) {
-      foreach ($factura['fisiere'] as $file) {
-        $stream=setasign\Fpdi\PdfParser\StreamReader::createByString($file);
-        $pages=$pdf->setSourceFile($stream);
-        for ($i=0; $i<$pages; $i++) {
-          $pdf->AddPage();
-          $tplIdx=$pdf->importPage($i+1);
-          $pdf->useTemplate($tplIdx,0,0,210);
-        }
-      }
+    if (isset($factura['fisiere']) && count($factura['fisiere'])) {
+      $draw[]=array('attachments',$factura['fisiere']);
     }
 
-    // întoarce documentul PDF, sau îl trimite inline în browser
+    // construiește numele documentului
 
-    $fileName=preg_replace('/[<>:"\/\\\|\?\*]/','',trim(str_replace(
+    $filename=preg_replace('/[<>:"\/\\\|\?\*]/','',trim(str_replace(
       array('{{data}}','{{numar}}','{{furnizor}}'),
       array($factura['dataFactura'],$factura['numar'],$factura['firmaNume']),
       $titlu
-    )));
+    ))).'.pdf';
 
-    if ($return) {
-      return $pdf->Output($fileName.'.pdf','S');
-    } else {
-      $pdf->Output($fileName.'.pdf','I');
-    }
+    // procesează instrucțiunile de desenare
+
+    xml2pdfDraw($draw,'Factura '.$factura['firmaNume'].' din '.$factura['dataFactura'],$filename,$return);
   }
 
 ?>
