@@ -8,18 +8,6 @@
     You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
   */
 
-  function xml2pdfDrawInit($pdf,&$vars) { // inițializează funcțiile de desenare
-    if (isset($pdf) && gettype($pdf)==='object' && method_exists($pdf,'SetAutoPageBreak')) {
-      $pdf->SetAutoPageBreak(false);
-    } else {
-      trigger_error("PDF not initialized",E_USER_ERROR);
-    }
-
-    $vars=array(
-      '_page'=>'1',
-    );
-  }
-
   function xml2pdfDrawEval($expr,$vars) { // rezolvă expresii aritmetice (*, /, +, -) cu variabile și fără paranteze
     if (gettype($expr)=='string') {
       // verifică dacă variabilele folosite există și au valori numerice și le înlocuiește cu valorile lor
@@ -98,7 +86,7 @@
     }
   }
 
-  function xml2pdfDraw($t,$pdf,&$vars) { // procesează o instrucțiune de desenare
+  function xml2pdfDrawOne($t,$pdf,&$vars) { // procesează o instrucțiune de desenare
     switch($t[0]) {
       // '_newPageBefore', array(...) (definește ce se întâmplă înainte să se adauge o pagină nouă)
 
@@ -139,14 +127,14 @@
           }
           if (isset($vars['_newPageBefore'])) {
             foreach ($vars['_newPageBefore'] as $tNP) {
-              xml2pdfDraw($tNP,$pdf,$vars);
+              xml2pdfDrawOne($tNP,$pdf,$vars);
             }
           }
           $vars['_page']++;
           $pdf->addPage();
           if (isset($vars['_newPageAfter'])) {
             foreach ($vars['_newPageAfter'] as $tNP) {
-              xml2pdfDraw($tNP,$pdf,$vars);
+              xml2pdfDrawOne($tNP,$pdf,$vars);
             }
           }
         }
@@ -259,12 +247,80 @@
       case 'image':
         $pdf->image($t[1],$t[2],xml2pdfDrawEval($t[3],$vars),0,$t[4],'PNG','','T');
         break;
+
+      // 'attachments', array(conținut fișier PDF #1, ...) (adaugă la final PDF-urile din array, se ia în calcul doar prima apariție)
+
+      case 'attachments':
+        // se procesează la începutul desenării
+        break;
+
     }
   }
 
-  function xml2pdfDrawAll($draw,$pdf,&$vars) { // procesează toate instrucțiunile de desenare
+  function xml2pdfDraw($draw,$documentTitle,$documentFilename,$return) {
+    // inițializează document PDF
+
+    $attachments=false;
+    foreach ($draw as $t) {
+      if ($t[0]=='attachments') {
+        $attachments=$t[1];
+        break;
+      }
+    }
+
+    if (class_exists('\setasign\Fpdi\Tcpdf\Fpdi') && $attachments) {
+      $pdf=new setasign\Fpdi\Tcpdf\Fpdi('P','mm','A4',true,'UTF-8');
+    } else {
+      $pdf=new TCPDF('P','mm','A4',true,'UTF-8');
+    }
+
+    $pdf->SetCreator(PDF_CREATOR);
+    $pdf->SetAuthor('xml2pdf.php');
+    $pdf->SetTitle($documentTitle);
+
+    $pdf->SetMargins(0,0,0);
+    $pdf->setCellPadding(0);
+    $pdf->setImageScale(1);
+    $pdf->setPrintHeader(false);
+    $pdf->setPrintFooter(false);
+    $pdf->SetAutoPageBreak(false);
+
+    // creează prima pagină
+
+    $pdf->AddPage();
+
+    // inițializează variabilele
+
+    $vars=array(
+      '_page'=>'1',
+    );
+
+     // procesează instrucțiunile de desenare
+
     foreach($draw as $t) {
-      xml2pdfDraw($t,$pdf,$vars);
+      xml2pdfDrawOne($t,$pdf,$vars);
+    }
+
+    // dacă există adaugă fișiere PDF anexate
+
+    if (class_exists('\setasign\Fpdi\Tcpdf\Fpdi') && $attachments) {
+      foreach ($attachments as $file) {
+        $stream=setasign\Fpdi\PdfParser\StreamReader::createByString($file);
+        $pages=$pdf->setSourceFile($stream);
+        for ($i=0; $i<$pages; $i++) {
+          $pdf->AddPage();
+          $tplIdx=$pdf->importPage($i+1);
+          $pdf->useTemplate($tplIdx,0,0,210);
+        }
+      }
+    }
+
+    // întoarce documentul PDF, sau îl trimite inline în browser
+
+    if ($return) {
+      return $pdf->Output($documentFilename,'S');
+    } else {
+      $pdf->Output($documentFilename,'I');
     }
   }
 
