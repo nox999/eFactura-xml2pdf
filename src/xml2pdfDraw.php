@@ -231,7 +231,7 @@
           0, // cell minimum height
           $text,
           0, // no border
-          gettype($align)=='array'?$align[1]:'L', // horizontal align
+          gettype($align)=='array'?(isset($align[1])?$align[1]:'L'):'L', // horizontal align
           0, // no fill
           (is_null($isNextLine) || !$isNextLine)?0:1 // mută poziția la dreapta/sus sau jos la începutul următoarei linii
         );
@@ -306,11 +306,22 @@
     if (class_exists('\setasign\Fpdi\Tcpdf\Fpdi') && $attachments) {
       foreach ($attachments as $file) {
         $stream=setasign\Fpdi\PdfParser\StreamReader::createByString($file);
-        $pages=$pdf->setSourceFile($stream);
-        for ($i=0; $i<$pages; $i++) {
+        $error=false;
+
+        try {
+          $pages=$pdf->setSourceFile($stream);
+        } catch (Exception $e) {
+          $error=true;
           $pdf->AddPage();
-          $tplIdx=$pdf->importPage($i+1);
-          $pdf->useTemplate($tplIdx,0,0,210);
+          xml2pdfDrawOne(array('text','Eroare: Anexa nu a putut fi atașată ('.$e->getMessage().')',10,10,10,false,array(200)),$pdf,$vars);
+        }
+
+        if (!$error) {
+          for ($i=0; $i<$pages; $i++) {
+            $pdf->AddPage();
+            $tplIdx=$pdf->importPage($i+1);
+            $pdf->useTemplate($tplIdx,0,0,210);
+          }
         }
       }
     }
