@@ -53,7 +53,7 @@
       'XPP'=>'buc.',
     );
 
-    $xmlString=preg_replace('/( (xmlns|xsi)(:[a-zA-Z0-9]+){0,1}="[^"]+")/','',$xmlString);
+    $xmlString=preg_replace('/([ \n]{1}(xmlns|xsi)(:[a-zA-Z0-9]+){0,1}="[^"]+")/','',$xmlString);
     $xmlString=str_replace(array('<cbc:','</cbc:','<cac:','</cac:','<ubl:','</ubl:'),array('<','</','<','</','<','</'),$xmlString);
     $xml=simplexml_load_string($xmlString);
 
