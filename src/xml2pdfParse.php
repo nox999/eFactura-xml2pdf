@@ -1,7 +1,7 @@
 <?php
 
   /*
-    Copyright (C) 2024
+    Copyright (C) 2025
 
     This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
     This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
@@ -51,6 +51,9 @@
       'SET'=>'set',
       'XBE'=>'pachet',
       'XPP'=>'buc.',
+    );
+    $taxeBonus=array(
+      'TV'=>'Transport',
     );
 
     $xmlString=preg_replace('/([ \n]{1}(xmlns|xsi)(:[a-zA-Z0-9]+){0,1}="[^"]+")/','',$xmlString);
@@ -149,6 +152,26 @@
             );
             if (isset($unitati[$produs['um']])) {
               $produs['umText']=$unitati[$produs['um']];
+            }
+            $factura['produse'][]=$produs;
+          }
+
+          if (count($xml->xpath('//AllowanceCharge'))) {
+            if ((string)$xml->xpath('//AllowanceCharge/ChargeIndicator')[0]==='true') { // handle charge
+              $produs=array(
+                'produs'=>$taxeBonus[(string)$xml->xpath('//AllowanceCharge/AllowanceChargeReasonCode')[0]]?$taxeBonus[(string)$xml->xpath('//AllowanceCharge/AllowanceChargeReasonCode')[0]]:'',
+                'descriere'=>trim((string)$xml->xpath('//AllowanceCharge/AllowanceChargeReason')[0]).' ('.trim((string)$xml->xpath('//AllowanceCharge/AllowanceChargeReasonCode')[0]).')',
+                'nota'=>'',
+                'codVanzator'=>'',
+                'pretFaraTVA'=>(float)$xml->xpath('//AllowanceCharge/Amount')[0],
+                'moneda'=>(string)$xml->xpath('//AllowanceCharge/Amount')[0]->attributes()->currencyID,
+                'cantitate'=>1,
+                'um'=>'buc.',
+                'TVA'=>(float)$xml->xpath('//AllowanceCharge/TaxCategory/Percent')[0],
+                'totalFaraTVA'=>(float)$xml->xpath('//AllowanceCharge/Amount')[0],
+              );
+            } else { // todo handle allowance
+
             }
             $factura['produse'][]=$produs;
           }
