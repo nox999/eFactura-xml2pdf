@@ -34,7 +34,7 @@
 
     // cele mai comune tipuri de documente, instrumente de plată și unități de măsură, la restul se afișează doar codul
 
-    $tipuriDocument=array('-'=>'Nedefinit','380'=>'Factură','751'=>'Factură - informații în scopuri contabile');
+    $tipuriDocument=array('-'=>'Nedefinit','380'=>'Factură','381'=>'Notă de creditare','751'=>'Factură - informații în scopuri contabile');
     $instrumentePlata=array('1'=>'Nespecificat','10'=>'Numerar','42'=>'Ordin de plată','48'=>'Card bancar','54'=>'Card de credit','55'=>'Card de debit','68'=>'Plata online','ZZZ'=>'Instrument agreat');
     $unitati=array(
       'C62'=>'unitate',
@@ -53,6 +53,9 @@
       'XPP'=>'buc.',
     );
     $taxeBonus=array(
+      // Allowance
+      '95'=>'Discount',
+      // Charge
       'TV'=>'Transport',
     );
 
@@ -156,24 +159,26 @@
             $factura['produse'][]=$produs;
           }
 
-          if (count($xml->xpath('//AllowanceCharge'))) {
-            if ((string)$xml->xpath('//AllowanceCharge/ChargeIndicator')[0]==='true') { // handle charge
+          if (count($xml->xpath('/Invoice/AllowanceCharge'))) { // AllowanceCharge la nivel de document (nu face la nivel de produs, todo)
+            foreach($xml->xpath('/Invoice/AllowanceCharge') as $ac) {
               $produs=array(
-                'produs'=>$taxeBonus[(string)$xml->xpath('//AllowanceCharge/AllowanceChargeReasonCode')[0]]?$taxeBonus[(string)$xml->xpath('//AllowanceCharge/AllowanceChargeReasonCode')[0]]:'',
-                'descriere'=>trim((string)$xml->xpath('//AllowanceCharge/AllowanceChargeReason')[0]).' ('.trim((string)$xml->xpath('//AllowanceCharge/AllowanceChargeReasonCode')[0]).')',
+                'produs'=>$taxeBonus[(string)$ac->xpath('AllowanceChargeReasonCode')[0]]?$taxeBonus[(string)$ac->xpath('AllowanceChargeReasonCode')[0]]:'',
+                'descriere'=>count($ac->xpath('AllowanceChargeReason'))?trim((string)$ac->xpath('AllowanceChargeReason')[0]).' ('.trim((string)$ac->xpath('AllowanceChargeReasonCode')[0]).')':'Cod: '.(string)$ac->xpath('AllowanceChargeReasonCode')[0],
                 'nota'=>'',
                 'codVanzator'=>'',
-                'pretFaraTVA'=>(float)$xml->xpath('//AllowanceCharge/Amount')[0],
-                'moneda'=>(string)$xml->xpath('//AllowanceCharge/Amount')[0]->attributes()->currencyID,
+                'pretFaraTVA'=>(float)$ac->xpath('Amount')[0],
+                'moneda'=>(string)$ac->xpath('Amount')[0]->attributes()->currencyID,
                 'cantitate'=>1,
                 'um'=>'buc.',
-                'TVA'=>(float)$xml->xpath('//AllowanceCharge/TaxCategory/Percent')[0],
-                'totalFaraTVA'=>(float)$xml->xpath('//AllowanceCharge/Amount')[0],
+                'TVA'=>(float)$ac->xpath('TaxCategory/Percent')[0],
+                'totalFaraTVA'=>(float)$ac->xpath('Amount')[0],
               );
-            } else { // todo handle allowance
-
+              if ((string)$ac->xpath('ChargeIndicator')[0]==='false') { // Este Allowance?
+                $produs['pretFaraTVA']=-$produs['pretFaraTVA'];
+                $produs['totalFaraTVA']=-$produs['totalFaraTVA'];
+              }
+              $factura['produse'][]=$produs;
             }
-            $factura['produse'][]=$produs;
           }
 
           $factura['fisiere']=array();
