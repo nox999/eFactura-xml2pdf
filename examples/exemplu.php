@@ -7,10 +7,11 @@
   $xmlString=file_get_contents('exemplu.xml');
   $factura=xml2pdfParse($xmlString);
 
-  if ($factura===false) {
-    exit('Eroare la parcurgerea fișierului XML.');
+  if (!is_array($factura)) {
+    exit('Eroare la parcurgerea fișierului XML. Cod eroare: '.$factura);
   }
 
   xml2pdfRender($factura,false,'factura {{furnizor}} ({{numar}} din {{data}})');
 
 ?>
+
