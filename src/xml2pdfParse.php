@@ -16,7 +16,9 @@
       $v=str_replace(' ','',trim($v));
       if (preg_match('/^(RO)?[0-9]{5,}$/',$v)) {
         $CIF=$v;
-      } elseif (preg_match_all('/([JFC]{1}[0-9]{2}\/[0-9]+\/[0-9\.]+)/',$v,$matches)) { // todo detectare J nou
+      } elseif (preg_match_all('/([JFC]{1}[0-9]{2}\/[0-9]+\/[0-9\.]+)/',$v,$matches)) { // J vechi
+        $nrRegCom=$matches[0][0];
+      } elseif (preg_match_all('/([JFC]{1}[0-9]{13})/',$v,$matches)) { // J nou
         $nrRegCom=$matches[0][0];
       }
     }
