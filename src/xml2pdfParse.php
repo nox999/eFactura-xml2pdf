@@ -172,7 +172,7 @@
                 $acDescriere='';
                 if (count($ac->xpath('AllowanceChargeReason'))) {
                   $acDescriere=trim((string)$ac->xpath('AllowanceChargeReason')[0]);
-                  if (count($ac->xpath('AllowanceChargeReasonCode')) && trim((string)$ac->xpath('AllowanceChargeReasonCode'))) {
+                  if (count($ac->xpath('AllowanceChargeReasonCode')) && trim((string)$ac->xpath('AllowanceChargeReasonCode')[0])) {
                     $acDescriere.=' (Cod: '.trim((string)$ac->xpath('AllowanceChargeReasonCode')[0]).')';
                   }
                 }
