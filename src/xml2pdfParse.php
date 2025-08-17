@@ -54,7 +54,7 @@
       'XBE'=>'pachet',
       'XPP'=>'buc.',
     );
-    $taxeBonus=array(
+    $acTipuri=array(
       // Allowance
       '95'=>'Discount',
       // Charge
@@ -162,11 +162,24 @@
               $factura['produse'][]=$produs;
             }
 
-            if (count($xml->xpath('/Invoice/AllowanceCharge'))) { // AllowanceCharge la nivel de document (nu face la nivel de produs, todo)
+            if (count($xml->xpath('/Invoice/AllowanceCharge'))) { // AllowanceCharge la nivel de document (nu face la nivel de produs, todo?)
               foreach($xml->xpath('/Invoice/AllowanceCharge') as $ac) {
+                $acProdus='';
+                if (count($ac->xpath('AllowanceChargeReasonCode')) && $acTipuri[(string)$ac->xpath('AllowanceChargeReasonCode')[0]]) {
+                  $acProdus=$acTipuri[(string)$ac->xpath('AllowanceChargeReasonCode')[0]];
+                }
+
+                $acDescriere='';
+                if (count($ac->xpath('AllowanceChargeReason'))) {
+                  $acDescriere=trim((string)$ac->xpath('AllowanceChargeReason')[0]);
+                  if (count($ac->xpath('AllowanceChargeReasonCode')) && trim((string)$ac->xpath('AllowanceChargeReasonCode'))) {
+                    $acDescriere.=' (Cod: '.trim((string)$ac->xpath('AllowanceChargeReasonCode')[0]).')';
+                  }
+                }
+
                 $produs=array(
-                  'produs'=>$taxeBonus[(string)$ac->xpath('AllowanceChargeReasonCode')[0]]?$taxeBonus[(string)$ac->xpath('AllowanceChargeReasonCode')[0]]:'',
-                  'descriere'=>count($ac->xpath('AllowanceChargeReason'))?trim((string)$ac->xpath('AllowanceChargeReason')[0]).' ('.trim((string)$ac->xpath('AllowanceChargeReasonCode')[0]).')':'Cod: '.(string)$ac->xpath('AllowanceChargeReasonCode')[0],
+                  'produs'=>$acProdus,
+                  'descriere'=>$acDescriere,
                   'nota'=>'',
                   'codVanzator'=>'',
                   'pretFaraTVA'=>(float)$ac->xpath('Amount')[0],
