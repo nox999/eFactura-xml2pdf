@@ -37,3 +37,7 @@ Se poate folosi template-ul existent sau se pot personaliza documentele cu ușur
 
 ### Factură PDF generată de xml2pdf.php
 ![xml2pdf](https://github.com/user-attachments/assets/b288b7f7-d3f2-4de6-9e58-8f3bf8c6f014)
+
+### Formatul siglelor furnizorilor
+
+Dacă **xml2pdf** găsește o imagine `[CUI-furnizor].png` în folder-ul `logo/` atunci aceasta va apărea în colțul din stânga sus al facturii. Pentru rezultate optime imaginea trebuie să fie transparentă sau pe fundal alb, înălțime 300px și lățime maxim 1000px.
