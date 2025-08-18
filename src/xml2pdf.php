@@ -50,7 +50,7 @@
       $hasLogo=true;
     };
 
-    $draw[]=array('text',"FACTURA ",$hasLogo?false:10,$hasLogo?false:10,12,true,array(0,'L',$hasLogo?'M':'',12),false);
+    $draw[]=array('text',strtoupper($factura['tipDocument']).' ',$hasLogo?false:10,$hasLogo?false:10,12,true,array(0,'L',$hasLogo?'M':'',12),false);
     $draw[]=array('text',"{$factura['numar']} / {$factura['dataFactura']}",false,false,12,false,array(0,'L',$hasLogo?'M':'',12));
     $draw[]=array(
       'text',
